@@ -90,7 +90,7 @@ const Edit = () => {
 						<select
 							name="priority"
 							id="priority"
-							className={`${
+							className={`bg-transparent ${
 								selectedOptionPriority != -1
 									? textColorOpt[
 											selectedOptionPriority
@@ -133,7 +133,7 @@ const Edit = () => {
 						<select
 							name="status"
 							id="status"
-							className={`${
+							className={`bg-transparent ${
 								selectedOptionStatus != -1
 									? textColorOpt[
 											selectedOptionStatus
