@@ -247,7 +247,7 @@ const Create = () => {
 			</div>
 
 			<div
-				className={`fixed w-screen h-screen bg-red-400/30 flex justify-center items-center ${
+				className={`fixed w-screen h-screen bg-black/30 flex justify-center items-center ${
 					!clickAdd && "hidden"
 				}`}
 			>

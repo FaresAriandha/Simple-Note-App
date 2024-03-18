@@ -24,12 +24,14 @@ const Note = (props) => {
 			<p className="w-full h-2/3 min-h-[50px] text-sm bg-white mt-3 p-2 rounded-lg ring-2 ring-black whitespace-pre-line overflow-scroll">
 				{desc.length > 0 ? desc : "No Desc Available"}
 			</p>
-			<NavLink
-				to={`/notes/${idNote}`}
-				className="w-fit h-fit px-3 p-1 bg-black text-white rounded-lg my-3 font-semibold relative left-full -translate-x-16"
-			>
-				More
-			</NavLink>
+			<div className="w-fit h-fit relative left-full -translate-x-full flex ">
+				<NavLink
+					to={`/notes/${idNote}`}
+					className="w-fit h-fit px-3 p-1 bg-black text-white rounded-lg my-3 font-semibold"
+				>
+					More
+				</NavLink>
+			</div>
 		</div>
 	);
 };

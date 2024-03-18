@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import Success from "../../public/lottiefiles/Success.json";
+import Warning from "../../public/lottiefiles/Warning.json";
 import Lottie from "lottie-react";
 
 const Edit = () => {
@@ -11,9 +12,16 @@ const Edit = () => {
 	const [notes, setNotes] = useState(
 		JSON.parse(localStorage.getItem("notes"))
 	);
-	const { idNote, title, desc, priority, status } = notes.find(
-		(item) => item.idNote == id
-	);
+
+	const [clickUpdate, setClickUpdate] = useState(false);
+	const [clickRemove, setClickRemove] = useState(false);
+	let note = {};
+
+	if (!clickRemove) {
+		note = notes.find((item) => item.idNote == id);
+	}
+
+	const { idNote, title, desc, priority, status } = note;
 
 	const textColorOpt = ["text-red-600", "text-yellow-500", "text-green-600"];
 	const ringColorSelect = [
@@ -26,7 +34,6 @@ const Edit = () => {
 	const [selectedOptionStatus, setSelectedOptionStatus] = useState(status);
 	const [titleNote, setTitleNote] = useState(title);
 	const [descNote, setDescNote] = useState(desc);
-	const [clickAdd, setClickAdd] = useState(false);
 
 	const handleChange = (event) => {
 		event.target.id == "priority"
@@ -61,7 +68,7 @@ const Edit = () => {
 
 		setNotes(notes);
 		localStorage.setItem("notes", JSON.stringify(notes));
-		setClickAdd(true);
+		setClickUpdate(true);
 
 		// console.log(notes);
 		// Alert Success
@@ -69,13 +76,26 @@ const Edit = () => {
 
 	const handleSuccessPopUp = () => {
 		setTimeout(() => {
-			setClickAdd(false);
+			setClickUpdate(false);
 			window.location.href = "/";
 		}, 500);
 	};
 
+	const handleSuccessRemove = () => {
+		notes.forEach((item, index) => {
+			if (item.idNote == id) {
+				notes.splice(index, 1);
+				setClickRemove(true);
+			}
+		});
+
+		setNotes(notes);
+		localStorage.setItem("notes", JSON.stringify(notes));
+		window.location.href = "/";
+	};
+
 	return (
-		<div className="w-screen h-full px-8 flex flex-col justify-start items-center ">
+		<div className="w-screen h-full px-8 flex flex-col justify-start items-center">
 			<h1
 				className={`text-lg font-bold mt-20 my-4 ${
 					pathname != "/add" && "hidden"
@@ -85,7 +105,7 @@ const Edit = () => {
 			</h1>
 			{/* Input */}
 			<div
-				className={`ring-0 ring-black w-full h-[100px] ${
+				className={`ring-0 ring-black w-full h-fit  ${
 					pathname != "/add" && "mt-20 mb-20"
 				}`}
 			>
@@ -125,7 +145,7 @@ const Edit = () => {
 						required="required"
 						placeholder="your plan"
 						rows={3}
-						className="peer outline-none border-none w-full h-fit ring-2 ring-gray-500 focus:ring-black rounded-lg mt-3 py-2 px-3 caret-black text-black resize-y"
+						className="peer outline-none border-none w-full h-fit ring-2 ring-gray-500 focus:ring-black rounded-lg mt-3 py-2 px-3 caret-black text-black resize-y "
 						value={descNote}
 					/>
 					<span className="mt-2 text-sm text-red-600 hidden">
@@ -219,7 +239,7 @@ const Edit = () => {
 						</span>
 					</div>
 				</div>
-				<div className="w-full h-[180px] flex flex-row items-start justify-between mt-10 gap-x-5 mb-20 ">
+				<div className="w-full h-fit flex flex-row items-start justify-between mt-10 gap-x-5">
 					<NavLink
 						className="w-1/2 min-w-fit py-2 rounded-md ring-2 ring-black active:scale-95 transition-all duration-300 font-semibold active:bg-slate-200 shadow-md shadow-gray-600 active:shadow-none inline-block text-center"
 						to={"/"}
@@ -233,11 +253,19 @@ const Edit = () => {
 						Update
 					</button>
 				</div>
+				<button
+					className="w-full h-fit mt-5 py-2.5 rounded-md bg-red-400 text-white  active:scale-95 transition-all duration-300 font-semibold shadow-md shadow-gray-600 active:shadow-none active:bg-red-600 text-center "
+					onClick={() => {
+						setClickRemove(true);
+					}}
+				>
+					Remove
+				</button>
 			</div>
 
 			<div
-				className={`fixed w-screen h-screen bg-red-400/30 flex justify-center items-center ${
-					!clickAdd && "hidden"
+				className={`fixed w-screen h-screen bg-black/30 flex justify-center items-center ${
+					!clickUpdate && "hidden"
 				}`}
 			>
 				<div className="w-9/12 h-fit p-2 bg-white rounded-lg flex  flex-col justify-center items-center">
@@ -256,6 +284,40 @@ const Edit = () => {
 					>
 						Close
 					</button>
+				</div>
+			</div>
+
+			<div
+				className={`fixed w-screen h-screen bg-black/30 flex justify-center items-center ${
+					!clickRemove && "hidden"
+				}`}
+			>
+				<div className="w-9/12 h-fit p-2 bg-white rounded-lg flex  flex-col justify-center items-center">
+					{/* Logo */}
+					<Lottie
+						animationData={Warning}
+						className="w-[150px] h-[150px]"
+					/>
+					{/* Text */}
+					<h1 className="font-bold text-center">
+						Are you sure delete this note ?
+					</h1>
+					<div className="w-full flex items-center justify-evenly ">
+						<button
+							className="w-2/5 h-fit py-2 text-black rounded-md text-center bg-white mb-1 mt-5 font-semibold active:scale-90 transition-all duration-200 ring-2 ring-black"
+							onClick={() => {
+								setClickRemove(false);
+							}}
+						>
+							No
+						</button>
+						<button
+							className="w-2/5 h-fit py-2 text-white rounded-md text-center bg-black mb-1 mt-5 font-semibold active:scale-90 transition-all duration-200 ring-2 ring-black"
+							onClick={handleSuccessRemove}
+						>
+							Yes
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
