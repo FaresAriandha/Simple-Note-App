@@ -1,33 +1,83 @@
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import Success from "../../public/lottiefiles/Success.json";
+import Lottie from "lottie-react";
 
 const Edit = () => {
+	const { pathname } = useLocation();
+	const { id } = useParams();
+
+	const [notes, setNotes] = useState(
+		JSON.parse(localStorage.getItem("notes"))
+	);
+	const { idNote, title, desc, priority, status } = notes.find(
+		(item) => item.idNote == id
+	);
+
 	const textColorOpt = ["text-red-600", "text-yellow-500", "text-green-600"];
 	const ringColorSelect = [
 		"ring-red-600",
 		"ring-yellow-500",
 		"ring-green-600",
 	];
-	("Lorem, ipsum dolor sit amet consectetur adipisicing elit. Et animi fugit corporis, cum impedit asperiores sint praesentium dolores laboriosam at id iusto reiciendis odio possimus quam. At excepturi impedit inventore, quia dolore libero laboriosam atque corrupti, iusto quaerat, molestias eaque est. Fugiat, quibusdam. Porro suscipit delectus aliquam doloribus quae libero? Blanditiis aspernatur eveniet voluptatum esse ad alias numquam dolorem quae dignissimos praesentium in tenetur dolore, nam officia quos porro pariatur ratione dolor laborum natus laudantium consequuntur eos harum! Quos, sint reprehenderit necessitatibus eveniet dolorum quo ipsam aliquam corrupti quaerat nemo assumenda quidem exercitationem at quis, debitis ea quod ipsa suscipit.");
-	const [selectedOptionPriority, setSelectedOptionPriority] = useState(-1);
-	const [selectedOptionStatus, setSelectedOptionStatus] = useState(-1);
-	const { pathname } = useLocation();
+	const [selectedOptionPriority, setSelectedOptionPriority] =
+		useState(priority);
+	const [selectedOptionStatus, setSelectedOptionStatus] = useState(status);
+	const [titleNote, setTitleNote] = useState(title);
+	const [descNote, setDescNote] = useState(desc);
+	const [clickAdd, setClickAdd] = useState(false);
+
 	const handleChange = (event) => {
-		console.log(event.target.id);
 		event.target.id == "priority"
 			? setSelectedOptionPriority(event.target.selectedIndex - 1)
 			: setSelectedOptionStatus(event.target.selectedIndex);
 	};
 
-	const handleChangeTextArea = (event) => {
+	const handleChangeDesc = (event) => {
 		event.target.style.height = "auto";
 		event.target.style.height = event.target.scrollHeight + "px";
+		setDescNote(event.target.value);
+	};
+
+	const handleChangeTitle = (event) => {
+		setTitleNote(event.target.value);
+	};
+
+	const onSubmitNote = () => {
+		const dataNote = {
+			idNote,
+			title: titleNote,
+			desc: descNote,
+			priority: selectedOptionPriority,
+			status: selectedOptionStatus,
+		};
+
+		notes.forEach((item, index) => {
+			if (item.idNote == id) {
+				notes[index] = dataNote;
+			}
+		});
+
+		setNotes(notes);
+		localStorage.setItem("notes", JSON.stringify(notes));
+		setClickAdd(true);
+
+		// console.log(notes);
+		// Alert Success
+	};
+
+	const handleSuccessPopUp = () => {
+		setTimeout(() => {
+			setClickAdd(false);
+			window.location.href = "/";
+		}, 500);
 	};
 
 	return (
-		<div className="w-screen h-full pt-10 px-8 flex flex-col justify-start items-center ">
+		<div className="w-screen h-full px-8 flex flex-col justify-start items-center ">
 			<h1
-				className={`text-lg font-bold mt-10 my-4 ${
+				className={`text-lg font-bold mt-20 my-4 ${
 					pathname != "/add" && "hidden"
 				}`}
 			>
@@ -36,7 +86,7 @@ const Edit = () => {
 			{/* Input */}
 			<div
 				className={`ring-0 ring-black w-full h-[100px] ${
-					pathname != "/add" && "mt-10 mb-20"
+					pathname != "/add" && "mt-20 mb-20"
 				}`}
 			>
 				<div className="title-note flex flex-col items-start justify-start">
@@ -47,12 +97,14 @@ const Edit = () => {
 						Title
 					</label>
 					<input
+						onChange={handleChangeTitle}
 						type="text"
 						name="title"
 						id="title"
 						required="required"
 						placeholder="your title"
 						className="peer outline-none border-none w-full ring-2 ring-gray-500 focus:ring-black rounded-lg mt-3 py-2 px-3 caret-black text-black"
+						value={titleNote}
 					/>
 					<span className="mt-2 text-sm text-red-600 hidden">
 						Must fill!
@@ -66,7 +118,7 @@ const Edit = () => {
 						Description
 					</label>
 					<textarea
-						onInput={handleChangeTextArea}
+						onChange={handleChangeDesc}
 						type="text"
 						name="desc"
 						id="desc"
@@ -74,6 +126,7 @@ const Edit = () => {
 						placeholder="your plan"
 						rows={3}
 						className="peer outline-none border-none w-full h-fit ring-2 ring-gray-500 focus:ring-black rounded-lg mt-3 py-2 px-3 caret-black text-black resize-y"
+						value={descNote}
 					/>
 					<span className="mt-2 text-sm text-red-600 hidden">
 						Must fill!
@@ -167,11 +220,41 @@ const Edit = () => {
 					</div>
 				</div>
 				<div className="w-full h-[180px] flex flex-row items-start justify-between mt-10 gap-x-5 mb-20 ">
-					<button className="w-1/2 min-w-fit py-2 rounded-md ring-2 ring-black active:scale-95 transition-all duration-300 font-semibold active:bg-slate-200 shadow-md shadow-gray-600 active:shadow-none">
+					<NavLink
+						className="w-1/2 min-w-fit py-2 rounded-md ring-2 ring-black active:scale-95 transition-all duration-300 font-semibold active:bg-slate-200 shadow-md shadow-gray-600 active:shadow-none inline-block text-center"
+						to={"/"}
+					>
 						Cancel
-					</button>
-					<button className="w-1/2 min-w-fit py-2 rounded-md ring-2 ring-black bg-black/80 text-white active:scale-95 transition-all duration-300 font-semibold active:bg-black shadow-md shadow-gray-600 active:shadow-none">
+					</NavLink>
+					<button
+						className="w-1/2 min-w-fit py-2 rounded-md ring-2 ring-black bg-black/80 text-white active:scale-95 transition-all duration-300 font-semibold active:bg-black shadow-md shadow-gray-600 active:shadow-none"
+						onClick={onSubmitNote}
+					>
 						Update
+					</button>
+				</div>
+			</div>
+
+			<div
+				className={`fixed w-screen h-screen bg-red-400/30 flex justify-center items-center ${
+					!clickAdd && "hidden"
+				}`}
+			>
+				<div className="w-9/12 h-fit p-2 bg-white rounded-lg flex  flex-col justify-center items-center">
+					{/* Logo */}
+					<Lottie
+						animationData={Success}
+						className="w-[150px] h-[150px]"
+					/>
+					{/* Text */}
+					<h1 className="font-bold text-center">
+						Note Updated Successfully!
+					</h1>
+					<button
+						className="w-full h-fit py-2 text-white rounded-md text-center bg-black mb-1 mt-5 font-semibold active:scale-90 transition-all duration-200"
+						onClick={handleSuccessPopUp}
+					>
+						Close
 					</button>
 				</div>
 			</div>
